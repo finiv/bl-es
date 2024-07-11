@@ -15,25 +15,11 @@ export default defineConfig({
                     includeAbsolute: false,
                 },
             },
+            resolve: name => {
+                const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
+                return pages[`./Pages/${name}.vue`]
+            },
         }),
+
     ],
 });
-
-// import { defineConfig } from 'vite';
-// import vue from '@vitejs/plugin-vue';
-// import path from 'path';
-//
-// export default defineConfig({
-//     plugins: [vue()],
-//     resolve: {
-//         alias: {
-//             '@': path.resolve(__dirname, 'resources/js'),
-//         },
-//     },
-//     server: {
-//         host: 'localhost',
-//         port: 3000,
-//     },
-// });
-//
-//

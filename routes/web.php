@@ -29,5 +29,3 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/profile', [DashboardController::class, 'form'])->name('profile.edit');
     Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 });
-
-require __DIR__.'/auth.php';
