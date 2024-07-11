@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -8,11 +12,22 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 |
 | Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/register', [RegisterController::class, 'create'])->name('register.form');
+Route::post('/register', [RegisterController::class, 'store'])->name('register.create');
+Route::get('/login', [AuthController::class, 'create'])->name('login.form');
+Route::post('/login', [AuthController::class, 'store'])->name('login.create');
+Route::get('/logout', [AuthController::class, 'destroy'])->name('logout');
+
+
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('/dashboard', [DashboardController::class, 'form'])->name('dashboard');
+    Route::get('/profile', [DashboardController::class, 'form'])->name('profile.edit');
+    Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 });
+
+require __DIR__.'/auth.php';
