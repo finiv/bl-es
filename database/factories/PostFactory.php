@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Category;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -17,10 +18,10 @@ class PostFactory extends Factory
      */
     public function definition(): array
     {
-        $numbers = range(1, 3);
-        shuffle($numbers);
+        $categoryIds = Category::pluck('id')->toArray();
+        shuffle($categoryIds);
         $count = rand(1, 3);
-        $categories = implode(',', array_slice($numbers, 0, $count));
+        $categories = implode(',', array_slice($categoryIds, 0, $count));
 
         return [
             'title' => fake()->sentence(),

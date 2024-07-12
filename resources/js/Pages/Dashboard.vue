@@ -2,7 +2,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import {Head, Link, usePage} from '@inertiajs/vue3';
 import {ref} from 'vue';
-// import {app} from "@inertiajs/inertia-vue3/src";
 
 const route = usePage();
 
@@ -13,7 +12,6 @@ const props = defineProps({
 const currentPage = ref(props.posts.current_page);
 const lastPage = ref(props.posts.last_page);
 const links = ref(props.posts.links);
-// app.config.globalProperties.$route = route
 
 function goToPage(url) {
     if (url) {
@@ -30,11 +28,14 @@ function goToPage(url) {
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
                         <h1 class="text-xl font-bold mb-4">Posts</h1>
+                        <Link :href="'/posts/' + 'create'" class="text-blue-500 hover:underline">
+                            Create post
+                        </Link>
                         <ul>
                             <li v-for="post in props.posts.data" :key="post.id" class="mb-4">
-                                <Link :href="'/posts/' + post.id" class="text-blue-500 hover:underline">
+                                <a :href="/posts/ + post.id" class="text-blue-500 hover:underline">
                                     {{ post.title }}
-                                </Link>
+                                </a>
                                 <p>{{ post.body ? post.body.substring(0, 100) : '' }}...</p>
                             </li>
                         </ul>
