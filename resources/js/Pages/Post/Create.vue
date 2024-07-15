@@ -66,7 +66,6 @@ const handleSubmit = () => {
         categories: selectedCategories.value,
     };
 
-    postData.categories = [111,1112,121212];
     Inertia.post('/posts', postData, {
         onSuccess: () => {
             title.value = '';
@@ -78,5 +77,5 @@ const handleSubmit = () => {
 </script>
 
 <style scoped>
-/* Add any necessary styles here */
+
 </style>
