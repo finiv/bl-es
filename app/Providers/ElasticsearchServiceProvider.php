@@ -23,7 +23,7 @@ class ElasticsearchServiceProvider extends ServiceProvider
 
             return ClientBuilder::create()
                 ->setHosts([env('ELASTICSEARCH_HOST', 'https://localhost:9200')])
-                ->setBasicAuthentication(env('ELASTICSEARCH_USERNAME', 'elastic'), env('ELASTICSEARCH_PASSWORD', 'tkfRzxjg=aZIZ-O-CQ4a'))
+                ->setBasicAuthentication(env('ELASTICSEARCH_USERNAME', 'elastic'), env('ELASTICSEARCH_PASSWORD'))
                 ->setSSLVerification(false)
                 ->setLogger($logger)
                 ->build();

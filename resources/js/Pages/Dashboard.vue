@@ -21,16 +21,16 @@
                         </ul>
                         <div class="mt-6 flex justify-between items-center">
                             <button
-                                v-if="links.prev"
-                                @click="goToPage(links.prev)"
+                                v-if="pagination.links.prev"
+                                @click="goToPage(pagination.links.prev)"
                                 class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
                             >
                                 Previous
                             </button>
-                            <span>Page {{ current_page }} of {{ last_page }}</span>
+                            <span>Page {{ pagination.current_page }} of {{ pagination.last_page }}</span>
                             <button
-                                v-if="links.next"
-                                @click="goToPage(links.next)"
+                                v-if="pagination.links.next"
+                                @click="goToPage(pagination.links.next)"
                                 class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
                             >
                                 Next
@@ -47,12 +47,12 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 
 const page = usePage();
-const posts = ref(page.props.posts);
-const current_page = ref(page.props.current_page);
-const last_page = ref(page.props.last_page);
-const links = ref(page.props.links);
+const data = page.props.data;
+const posts = ref(data.posts);
+const pagination = ref(data.pagination);
 
 function goToPage(url) {
     if (url) {

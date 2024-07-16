@@ -21,9 +21,10 @@ Route::get('/register', [RegisterController::class, 'create'])->name('register.f
 Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
 Route::get('/login', [AuthController::class, 'create'])->name('login.form');
 Route::post('/login', [AuthController::class, 'store'])->name('login.store');
-Route::get('/logout', [AuthController::class, 'destroy'])->name('logout');
+
 
 Route::group(['middleware' => 'auth'], function () {
+    Route::get('/logout', [AuthController::class, 'destroy'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'form'])->name('dashboard');
     Route::get('/profile', [DashboardController::class, 'form'])->name('profile.edit');
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.form');
