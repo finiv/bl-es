@@ -1,25 +1,3 @@
-<script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import {Head, Link, usePage} from '@inertiajs/vue3';
-import {ref} from 'vue';
-
-const route = usePage();
-
-const props = defineProps({
-    posts: Object,
-});
-
-const currentPage = ref(props.posts.current_page);
-const lastPage = ref(props.posts.last_page);
-const links = ref(props.posts.links);
-
-function goToPage(url) {
-    if (url) {
-        window.location.href = url;
-    }
-}
-</script>
-
 <template>
     <AuthenticatedLayout>
         <Head title="Dashboard"/>
@@ -27,27 +5,35 @@ function goToPage(url) {
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
-                        <h1 class="text-xl font-bold mb-4">Posts</h1>
-                        <Link :href="'/posts/' + 'create'" class="text-blue-500 hover:underline">
-                            Create post
-                        </Link>
+                        <div class="flex justify-between items-center mb-6">
+                            <h1 class="text-2xl font-bold">Posts</h1>
+                            <Link :href="'/posts/create'" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                                Create post
+                            </Link>
+                        </div>
                         <ul>
-                            <li v-for="post in props.posts.data" :key="post.id" class="mb-4">
-                                <a :href="/posts/ + post.id" class="text-blue-500 hover:underline">
+                            <li v-for="post in posts" :key="post.id" class="mb-4 border-b pb-4">
+                                <Link :href="`/posts/${post.id}`" class="text-xl font-semibold text-blue-500 hover:underline">
                                     {{ post.title }}
-                                </a>
-                                <p>{{ post.body ? post.body.substring(0, 100) : '' }}...</p>
+                                </Link>
+                                <p class="mt-2 text-gray-700">{{ post.body ? post.body.substring(0, 100) : '' }}...</p>
                             </li>
                         </ul>
-                        <div class="mt-4">
+                        <div class="mt-6 flex justify-between items-center">
                             <button
-                                v-for="link in links"
-                                :key="link.label"
-                                @click="goToPage(link.url)"
-                                :class="['mx-1', link.active ? 'text-bold' : '']"
-                                :disabled="!link.url"
+                                v-if="links.prev"
+                                @click="goToPage(links.prev)"
+                                class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
                             >
-                                {{ link.label }}
+                                Previous
+                            </button>
+                            <span>Page {{ current_page }} of {{ last_page }}</span>
+                            <button
+                                v-if="links.next"
+                                @click="goToPage(links.next)"
+                                class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                            >
+                                Next
                             </button>
                         </div>
                     </div>
@@ -56,3 +42,45 @@ function goToPage(url) {
         </div>
     </AuthenticatedLayout>
 </template>
+
+<script setup>
+import { Head, Link } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+
+const page = usePage();
+const posts = ref(page.props.posts);
+const current_page = ref(page.props.current_page);
+const last_page = ref(page.props.last_page);
+const links = ref(page.props.links);
+
+function goToPage(url) {
+    if (url) {
+        window.location.href = url;
+    }
+}
+</script>
+
+<style scoped>
+.post {
+    margin-bottom: 1.5rem;
+}
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+}
+button {
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+</style>

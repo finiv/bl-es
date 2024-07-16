@@ -23,7 +23,6 @@ Route::get('/login', [AuthController::class, 'create'])->name('login.form');
 Route::post('/login', [AuthController::class, 'store'])->name('login.store');
 Route::get('/logout', [AuthController::class, 'destroy'])->name('logout');
 
-
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/dashboard', [DashboardController::class, 'form'])->name('dashboard');
     Route::get('/profile', [DashboardController::class, 'form'])->name('profile.edit');
