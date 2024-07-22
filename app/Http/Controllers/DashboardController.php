@@ -18,7 +18,7 @@ class DashboardController extends Controller
         $perPage = $request->input('perPage', 10);
 
         return Inertia::render('Dashboard', [
-            'data' => $this->elasticSearchService->getAllPosts(page: $page, perPage: $perPage),
+            'data' => $this->elasticSearchService->searchPosts(query: $request->get('q') ?? null, page: $page, perPage: $perPage),
         ]);
     }
 

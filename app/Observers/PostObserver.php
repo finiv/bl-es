@@ -42,7 +42,7 @@ class PostObserver
         //    'index' => 'posts',
         //    'id' => $post->id,
         //]);
-
+        //
         //if ($response->getStatusCode() !== 404) {
         try {
             $this->client->delete([
