@@ -4,9 +4,13 @@ namespace App\Observers;
 
 use App\Models\Post;
 use Elastic\Elasticsearch\Client;
+use Illuminate\Support\Facades\Log;
+
 class PostObserver
 {
-    public function __construct(private readonly Client $client) {}
+    public function __construct(private readonly Client $client)
+    {
+    }
 
     public function created(Post $post): void
     {
@@ -27,23 +31,27 @@ class PostObserver
     {
         $this->client->index([
             'index' => 'posts',
-            'id'    => $post->id,
-            'body'  => $post->toArray(),
+            'id' => $post->id,
+            'body' => $post->toArray(),
         ]);
     }
 
     protected function deleteFromElasticsearch(Post $post): void
     {
-        $response = $this->client->exists([
-            'index' => 'posts',
-            'id'    => $post->id,
-        ]);
+        //$response = $this->client->exists([
+        //    'index' => 'posts',
+        //    'id' => $post->id,
+        //]);
 
-        if ($response->getStatusCode() !== 404) {
+        //if ($response->getStatusCode() !== 404) {
+        try {
             $this->client->delete([
                 'index' => 'posts',
-                'id'    => $post->id,
+                'id' => $post->id,
             ]);
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
         }
+        //}
     }
 }
