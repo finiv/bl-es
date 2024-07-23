@@ -5,12 +5,24 @@
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
-                        <div class="flex justify-between items-center mb-6">
-                            <h1 class="text-2xl font-bold">Posts</h1>
-                            <input v-model="searchQuery" @input="handleSearchInput" placeholder="Search posts..." class="border rounded px-4 py-2"/>
-                            <Link :href="'/posts/create'" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                                Create post
-                            </Link>
+                        <div class="flex flex-col sm:flex-row sm:justify-between items-center mb-6">
+                            <h1 class="text-2xl font-bold mb-4 sm:mb-0">Posts</h1>
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+                                <input v-model="searchQuery" @input="handleSearchInput" placeholder="Search posts..." class="border rounded px-4 py-2 mb-4 sm:mb-0"/>
+                                <multiselect
+                                    v-model="selectedCategories"
+                                    :options="categories"
+                                    :multiple="true"
+                                    label="name"
+                                    track-by="id"
+                                    placeholder="Select categories"
+                                    @input="handleCategoryChange"
+                                    class="mb-4 sm:mb-0"
+                                />
+                                <Link :href="'/posts/create'" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                                    Create post
+                                </Link>
+                            </div>
                         </div>
                         <ul>
                             <li v-for="post in posts" :key="post.id" class="mb-4 border-b pb-4">
@@ -45,10 +57,12 @@
 </template>
 
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
-import { ref } from 'vue';
-import { usePage } from '@inertiajs/vue3';
+import {Head, Link} from '@inertiajs/vue3';
+import {ref, watch} from 'vue';
+import {usePage} from '@inertiajs/vue3';
 import axios from 'axios';
+import Multiselect from 'vue-multiselect';
+import 'vue-multiselect/dist/vue-multiselect.css';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 
 const page = usePage();
@@ -56,36 +70,48 @@ const data = page.props.data;
 const posts = ref(data.posts);
 const pagination = ref(data.pagination);
 const searchQuery = ref('');
+const selectedCategories = ref([]);
+const categories = ref(page.props.categories);
 
-function handleSearchInput(event) {
-    // Оновлюємо URL згідно з новим пошуковим запитом
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.set('q', searchQuery.value);
-    urlParams.set('page', '1'); // Стартуємо з першої сторінки при новому пошуковому запиті
-    window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
+function handleCategoryChange() {
+    searchPosts();
+}
 
-    searchPosts(1); // Здійснюємо пошук знову при введенні нового запиту
+function handleSearchInput() {
+    searchPosts();
 }
 
 async function searchPosts(page = 1) {
     try {
-        let url = '/api/posts';
+        let url = '/api/posts/search?';
+        const queryParams = new URLSearchParams();
+
         if (searchQuery.value.length > 0) {
-            url = `/api/posts/search?q=${searchQuery.value}`;
+            queryParams.append('q', searchQuery.value);
         }
-        const response = await axios.get(`${url}&page=${page}`);
+
+        if (selectedCategories.value.length > 0) {
+            queryParams.append('categories', selectedCategories.value.map(cat => cat.id).join(','));
+        }
+
+        queryParams.append('page', page);
+
+        const response = await axios.get(`${url}?${queryParams.toString()}`);
         posts.value = response.data.posts;
         pagination.value = response.data.pagination;
 
         const urlParams = new URLSearchParams(window.location.search);
         urlParams.set('q', searchQuery.value);
         urlParams.set('page', page.toString());
+        if (selectedCategories.value.length > 0) {
+            urlParams.set('categories', selectedCategories.value.map(cat => cat.id).join(','));
+        }
         window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
-
     } catch (error) {
         console.error('Error searching posts:', error);
     }
 }
+
 </script>
 
 <style scoped>

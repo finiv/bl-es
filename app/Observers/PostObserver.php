@@ -8,9 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class PostObserver
 {
-    public function __construct(private readonly Client $client)
-    {
-    }
+    public function __construct(private readonly Client $client) {}
 
     public function created(Post $post): void
     {

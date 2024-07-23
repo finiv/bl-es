@@ -9,55 +9,28 @@ class ElasticSearchService
 {
     use Paginates;
 
-    public function __construct(private readonly Client $client)
-    {
-    }
+    public function __construct(private readonly Client $client) {}
 
-    public function getAllPosts(int $page = 1, int $perPage = 10): object
+    public function searchPosts(string $query = null, int $page = 1, int $perPage = 10): object
     {
         $from = ($page - 1) * $perPage;
 
-        $response = $this->client->search([
+        $params = [
             'index' => 'posts',
             'body' => [
-                'query' => [
-                    'match_all' => (object) [],
-                ],
-                'size' => $perPage,
-                'from' => $from,
+                'query' => [],
             ],
-        ]);
-
-        $posts = collect($response['hits']['hits'])->map(function ($hit) {
-            return $hit['_source'];
-        });
-
-        $total = $response['hits']['total']['value'];
-
-        return (object) [
-            'posts' => $posts,
-            'pagination' => $this->paginate($total, $perPage, $page),
+            'size' => $perPage,
+            'from' => $from,
         ];
-    }
 
-    public function searchPosts(string $query, int $page = 1, int $perPage = 10): object
-    {
-        $from = ($page - 1) * $perPage;
+        if ($query !== null) {
+            $params['body']['query'] = ['multi_match' => ['query' => $query, 'fields' => ['title', 'body']]];
+        } else {
+            $params['body']['query'] = ['match_all' => (object) []];
+        }
 
-        $response = $this->client->search([
-            'index' => 'posts',
-            'body' => [
-                'query' => [
-                    'multi_match' => [
-                        'query' => $query,
-                        'fields' => ['title', 'body'],
-                    ],
-                ],
-                'size' => $perPage,
-                'from' => $from,
-            ],
-        ]);
-
+        $response = $this->client->search($params);
         $posts = collect($response['hits']['hits'])->map(function ($hit) {
             return $hit['_source'];
         });
@@ -67,21 +40,6 @@ class ElasticSearchService
         return (object) [
             'posts' => $posts,
             'pagination' => $this->paginate($total, $perPage, $page),
-        ];
-    }
-
-    private function paginate(int $total, int $perPage, int $currentPage): object
-    {
-        $lastPage = (int) ceil($total / $perPage);
-
-        return (object) [
-            'current_page' => $currentPage,
-            'last_page' => $lastPage,
-            'total' => $total,
-            'links' => [
-                'prev' => $currentPage > 1 ? $currentPage - 1 : null,
-                'next' => $currentPage < $lastPage ? $currentPage + 1 : null,
-            ],
         ];
     }
 }

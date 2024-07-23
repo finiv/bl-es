@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Services\ElasticSearchService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,6 +20,7 @@ class DashboardController extends Controller
 
         return Inertia::render('Dashboard', [
             'data' => $this->elasticSearchService->searchPosts(query: $request->get('q') ?? null, page: $page, perPage: $perPage),
+            'categories' => Category::all(),
         ]);
     }
 
