@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('author_id');
             $table->string('title');
             $table->text('body');
-            $table->string('categories');
+            $table->json('categories');
             $table->timestamps();
 
             $table->foreign('author_id')->references('id')->on('users');

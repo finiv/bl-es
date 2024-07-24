@@ -15,6 +15,10 @@ class Post extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'categories' => 'array',
+    ];
+
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class);

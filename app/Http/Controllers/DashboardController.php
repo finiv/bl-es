@@ -17,9 +17,15 @@ class DashboardController extends Controller
     {
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
+        $categories = $request->input('c', []);
 
         return Inertia::render('Dashboard', [
-            'data' => $this->elasticSearchService->searchPosts(query: $request->get('q') ?? null, page: $page, perPage: $perPage),
+            'data' => $this->elasticSearchService->searchPosts(
+                query: $request->get('q') ?? null,
+                categories: $categories,
+                page: $page,
+                perPage: $perPage
+            ),
             'categories' => Category::all(),
         ]);
     }
@@ -29,7 +35,15 @@ class DashboardController extends Controller
         $query = $request->input('q');
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
+        if ($request->has('c') && $request->input('c')) {
+            $categories = explode(',', $request->input('c'));
+        }
 
-        return response()->json($this->elasticSearchService->searchPosts($query, $page, $perPage));
+        return response()->json($this->elasticSearchService->searchPosts(
+            query: $query,
+            categories: $categories ?? [],
+            page: $page,
+            perPage: $perPage
+        ));
     }
 }

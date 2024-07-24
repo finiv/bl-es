@@ -21,7 +21,7 @@ class PostFactory extends Factory
         $categoryIds = Category::pluck('id')->toArray();
         shuffle($categoryIds);
         $count = rand(1, 3);
-        $categories = implode(',', array_slice($categoryIds, 0, $count));
+        $categories = json_encode(array_slice($categoryIds, 0, $count));
 
         return [
             'title' => fake()->sentence(),

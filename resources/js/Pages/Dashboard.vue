@@ -16,7 +16,7 @@
                                     label="name"
                                     track-by="id"
                                     placeholder="Select categories"
-                                    @input="handleCategoryChange"
+                                    @select="handleCategoryChange"
                                     class="mb-4 sm:mb-0"
                                 />
                                 <Link :href="'/posts/create'" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
@@ -27,7 +27,7 @@
                         <ul>
                             <li v-for="post in posts" :key="post.id" class="mb-4 border-b pb-4">
                                 <Link :href="`/posts/${post.id}`" class="text-xl font-semibold text-blue-500 hover:underline">
-                                    <strong>{{ post.id }}</strong><br>{{ post.title }}
+                                    <strong>{{ post.categories }}</strong><br>{{ post.title }}
                                 </Link>
                                 <p class="mt-2 text-gray-700">{{ post.body ? post.body.substring(0, 100) : '' }}...</p>
                             </li>
@@ -73,15 +73,17 @@ const searchQuery = ref('');
 const selectedCategories = ref([]);
 const categories = ref(page.props.categories);
 
-function handleCategoryChange() {
+function handleCategoryChange(event) {
+    // console.log('event')
     searchPosts();
 }
 
-function handleSearchInput() {
+function handleSearchInput(event) {
     searchPosts();
 }
 
 async function searchPosts(page = 1) {
+
     try {
         let url = '/api/posts/search?';
         const queryParams = new URLSearchParams();
@@ -91,7 +93,7 @@ async function searchPosts(page = 1) {
         }
 
         if (selectedCategories.value.length > 0) {
-            queryParams.append('categories', selectedCategories.value.map(cat => cat.id).join(','));
+            queryParams.append('c', selectedCategories.value.map(cat => cat.id).join(','));
         }
 
         queryParams.append('page', page);
@@ -104,7 +106,7 @@ async function searchPosts(page = 1) {
         urlParams.set('q', searchQuery.value);
         urlParams.set('page', page.toString());
         if (selectedCategories.value.length > 0) {
-            urlParams.set('categories', selectedCategories.value.map(cat => cat.id).join(','));
+            urlParams.set('c', selectedCategories.value.map(cat => cat.id).join(','));
         }
         window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
     } catch (error) {

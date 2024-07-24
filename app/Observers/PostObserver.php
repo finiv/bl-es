@@ -12,11 +12,13 @@ class PostObserver
 
     public function created(Post $post): void
     {
+        $this->ensureIndexExists();
         $this->indexToElasticsearch($post);
     }
 
     public function updated(Post $post): void
     {
+        $this->ensureIndexExists();
         $this->indexToElasticsearch($post);
     }
 
@@ -25,31 +27,73 @@ class PostObserver
         $this->deleteFromElasticsearch($post);
     }
 
+    protected function ensureIndexExists(): void
+    {
+        $indexAlias = 'posts';
+        $exists = $this->client->indices()->existsAlias(['name' => $indexAlias]);
+
+        if (!$exists) {
+            $indexName = $indexAlias . '_' . time();
+            $params = [
+                'index' => $indexName,
+                'body' => [
+                    'mappings' => [
+                        'properties' => [
+                            'title' => [
+                                'type' => 'text'
+                            ],
+                            'body' => [
+                                'type' => 'text'
+                            ],
+                            'categories' => [
+                                'type' => 'integer'
+                            ]
+                        ]
+                    ]
+                ]
+            ];
+
+            $this->client->indices()->create($params);
+
+            $this->client->indices()->putAlias([
+                'index' => $indexName,
+                'name' => $indexAlias,
+            ]);
+        }
+    }
+
+    protected function getIndexForAlias(string $alias): string
+    {
+        $response = $this->client->indices()->getAlias(['name' => $alias]);
+        $indices = array_keys($response->asArray());
+        return $indices[0] ?? $alias;
+    }
+
     protected function indexToElasticsearch(Post $post): void
     {
+        $index = $this->getIndexForAlias('posts');
+
+        $data = $post->toArray();
+        $data['categories'] = array_map('intval', json_decode($post->categories, true));
+
         $this->client->index([
-            'index' => 'posts',
+            'index' => $index,
             'id' => $post->id,
-            'body' => $post->toArray(),
+            'body' => $data,
         ]);
     }
 
     protected function deleteFromElasticsearch(Post $post): void
     {
-        //$response = $this->client->exists([
-        //    'index' => 'posts',
-        //    'id' => $post->id,
-        //]);
-        //
-        //if ($response->getStatusCode() !== 404) {
+        $index = $this->getIndexForAlias('posts');
+
         try {
             $this->client->delete([
-                'index' => 'posts',
+                'index' => $index,
                 'id' => $post->id,
             ]);
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
         }
-        //}
     }
 }

@@ -11,23 +11,42 @@ class ElasticSearchService
 
     public function __construct(private readonly Client $client) {}
 
-    public function searchPosts(string $query = null, int $page = 1, int $perPage = 10): object
+    public function searchPosts(string $query = null, array $categories = [], int $page = 1, int $perPage = 10): object
     {
         $from = ($page - 1) * $perPage;
 
         $params = [
             'index' => 'posts',
             'body' => [
-                'query' => [],
+                'query' => [
+                    'bool' => [
+                        'must' => [],
+                    ],
+                ],
+                'size' => $perPage,
+                'from' => $from,
             ],
-            'size' => $perPage,
-            'from' => $from,
         ];
 
         if ($query !== null) {
-            $params['body']['query'] = ['multi_match' => ['query' => $query, 'fields' => ['title', 'body']]];
+            $params['body']['query']['bool']['must'][] = [
+                'multi_match' => [
+                    'query' => $query,
+                    'fields' => ['title', 'body'],
+                ],
+            ];
+        }
+
+        if (!empty($categories)) {
+            $params['body']['query']['bool']['must'][] = [
+                'terms' => [
+                    'categories' => $categories,
+                ],
+            ];
         } else {
-            $params['body']['query'] = ['match_all' => (object) []];
+            $params['body']['query']['bool']['must'][] = [
+                'match_all' => (object)[],
+            ];
         }
 
         $response = $this->client->search($params);
