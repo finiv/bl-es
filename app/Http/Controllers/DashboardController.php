@@ -17,7 +17,7 @@ class DashboardController extends Controller
     {
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
-        $categories = $request->input('c', []);
+        $categories = (array) $request->input('c', []);
 
         return Inertia::render('Dashboard', [
             'data' => $this->elasticSearchService->searchPosts(

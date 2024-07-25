@@ -1,13 +1,7 @@
 <script setup>
-import { ref } from 'vue';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
-import NavLink from '@/Components/NavLink.vue';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link, usePage } from '@inertiajs/vue3';
-
-const showingNavigationDropdown = ref(false);
+import { usePage } from '@inertiajs/vue3';
 
 const { props } = usePage();
 </script>
@@ -16,17 +10,8 @@ const { props } = usePage();
     <div>
         <div class="min-h-screen bg-gray-100">
             <nav class="bg-white border-b border-gray-100">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mr-5">
                     <div class="flex justify-between h-16">
-                        <div class="flex">
-                            <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <NavLink href="/dashboard"
-                                >
-                                    Dashboard
-                                </NavLink>
-                            </div>
-                        </div>
-
                         <div class="hidden sm:flex sm:items-center sm:ml-6">
                             <!-- Settings Dropdown -->
                             <div class="ml-3 relative">
@@ -57,29 +42,6 @@ const { props } = usePage();
                         </div>
                     </div>
                 </div>
-
-                <!-- Responsive Navigation Menu -->
-                <div
-                    :class="{ 'block': showingNavigationDropdown, 'hidden': !showingNavigationDropdown }"
-                    class="sm:hidden"
-                >
-                    <!-- Responsive Settings Options -->
-                    <div class="pt-4 pb-1 border-t border-gray-200">
-                        <div class="px-4">
-                            <div class="font-medium text-base text-gray-800">
-                                {{ props.auth.user.name }}
-                            </div>
-                            <div class="font-medium text-sm text-gray-500">{{ props.auth.user.email }}</div>
-                        </div>
-
-                        <div class="mt-3 space-y-1">
-<!--                            <ResponsiveNavLink :href="route('profile.edit')"> Profile </ResponsiveNavLink>-->
-                            <ResponsiveNavLink href="/logout" method="get" as="button">
-                                Log Out
-                            </ResponsiveNavLink>
-                        </div>
-                    </div>
-                </div>
             </nav>
 
             <!-- Page Heading -->
@@ -96,3 +58,14 @@ const { props } = usePage();
         </div>
     </div>
 </template>
+
+<style scoped>
+    nav {
+        display: flex;
+        flex-direction: row;
+        justify-content: end;
+    }
+    .mr-5 {
+        margin-right: 5px;
+    }
+</style>

@@ -7,29 +7,37 @@
                     <div class="p-6 text-gray-900">
                         <div class="flex flex-col sm:flex-row sm:justify-between items-center mb-6">
                             <h1 class="text-2xl font-bold mb-4 sm:mb-0">Posts</h1>
-                            <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
-                                <input v-model="searchQuery" @input="handleSearchInput" placeholder="Search posts..." class="border rounded px-4 py-2 mb-4 sm:mb-0"/>
-                                <multiselect
-                                    v-model="selectedCategories"
-                                    :options="categories"
-                                    :multiple="true"
-                                    label="name"
-                                    track-by="id"
-                                    placeholder="Select categories"
-                                    @select="handleCategoryChange"
-                                    class="mb-4 sm:mb-0"
-                                />
-                                <Link :href="'/posts/create'" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 w-full filters">
+                                <div style="display: flex; margin: 5px;">
+                                    <input v-model="searchQuery" @input="handleSearchInput" placeholder="Search posts..." class="input-field mb-4 sm:mb-0 sm:flex-1"/>
+                                    <multiselect
+                                        v-model="selectedCategories"
+                                        :options="categories"
+                                        :multiple="true"
+                                        label="name"
+                                        track-by="id"
+                                        placeholder="Select categories"
+                                        @select="handleCategoryChange"
+                                        class="input-field mb-4 sm:mb-0 sm:flex-1"
+                                    />
+                                </div>
+
+                                <Link :href="'/posts/create'" class="create-post-btn mb-4 sm:mb-0">
                                     Create post
                                 </Link>
                             </div>
                         </div>
-                        <ul>
-                            <li v-for="post in posts" :key="post.id" class="mb-4 border-b pb-4">
-                                <Link :href="`/posts/${post.id}`" class="text-xl font-semibold text-blue-500 hover:underline">
-                                    <strong>{{ post.categories }}</strong><br>{{ post.title }}
-                                </Link>
-                                <p class="mt-2 text-gray-700">{{ post.body ? post.body.substring(0, 100) : '' }}...</p>
+                        <ul class="space-y-6">
+                            <li v-for="post in posts" :key="post.id" class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-md">
+                                <div class="flex">
+                                    <img src="/path-to-placeholder-image.jpg" alt="Post Image" class="w-1/3 object-cover h-48">
+                                    <div class="p-4 w-2/3">
+                                        <Link :href="`/posts/${post.id}`" class="text-xl font-semibold text-blue-500 hover:underline">
+                                            <strong>{{ post.categories }}</strong><br>{{ post.title }}
+                                        </Link>
+                                        <p class="mt-2 text-gray-700">{{ post.body ? post.body.substring(0, 100) : '' }}...</p>
+                                    </div>
+                                </div>
                             </li>
                         </ul>
                         <div class="mt-6 flex justify-between items-center" v-if="pagination && pagination.links">
@@ -74,7 +82,6 @@ const selectedCategories = ref([]);
 const categories = ref(page.props.categories);
 
 function handleCategoryChange(event) {
-    // console.log('event')
     searchPosts();
 }
 
@@ -83,7 +90,6 @@ function handleSearchInput(event) {
 }
 
 async function searchPosts(page = 1) {
-
     try {
         let url = '/api/posts/search?';
         const queryParams = new URLSearchParams();
@@ -113,7 +119,6 @@ async function searchPosts(page = 1) {
         console.error('Error searching posts:', error);
     }
 }
-
 </script>
 
 <style scoped>
@@ -140,5 +145,52 @@ button {
 button:disabled {
     background-color: #6c757d;
     cursor: not-allowed;
+}
+
+/* Common styles for input and select fields */
+.input-field,
+.multiselect {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 0.5rem;
+    font-size: 1rem;
+    width: 100%;
+    max-width: 300px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.2s;
+    height: 40px; /* Ensuring the same height */
+    display: flex;
+    align-items: center;
+}
+
+.input-field:focus,
+.multiselect:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.create-post-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #007bff;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    height: 40px; /* Ensuring the same height */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s;
+}
+
+.create-post-btn:hover {
+    background-color: #0056b3;
+}
+
+.filters {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 </style>
