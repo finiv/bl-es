@@ -61,4 +61,18 @@ class ElasticSearchService
             'pagination' => $this->paginate($total, $perPage, $page),
         ];
     }
+
+    public function getCategories(): object
+    {
+        $params = [
+            'index' => 'posts',
+            'body' => [
+                'query' => [
+                    'bool' => [
+                        'must' => [],
+                    ],
+                ],
+            ],
+        ];
+    }
 }

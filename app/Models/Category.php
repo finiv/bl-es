@@ -2,16 +2,41 @@
 
 namespace App\Models;
 
+use App\Observers\CategoryObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+#[ObservedBy([CategoryObserver::class])]
 class Category extends Model
 {
     use HasFactory;
 
-    public function posts(): BelongsToMany
+    public function getAliasAttribute(): string
     {
-        return $this->belongsToMany(Post::class);
+        return 'categories';
+    }
+
+    public function getElasticSearchParamsAttribute(): array
+    {
+        return [
+            'index' => $this->alias . '_' . time(),
+            'body' => [
+                'mappings' => [
+                    'properties' => [
+                        'name' => [
+                            'type' => 'text'
+                        ],
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    public function getElasticsearchBodyAttribute(): array
+    {
+        return [
+            'name' => $this->name,
+        ];
     }
 }
