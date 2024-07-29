@@ -79,8 +79,7 @@ const posts = ref(data.posts);
 const pagination = ref(data.pagination);
 const searchQuery = ref('');
 const selectedCategories = ref([]);
-const categories = ref(page.props.categories);
-
+const categories = ref(data.categories);
 function handleCategoryChange(event) {
     searchPosts();
 }

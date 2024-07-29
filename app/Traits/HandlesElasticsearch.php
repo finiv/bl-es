@@ -10,7 +10,7 @@ trait HandlesElasticsearch
 {
     public function __construct(private readonly Client $client) {}
 
-    public function elasticsearchOnCreate(Model $model)
+    public function elasticsearchOnCreate(Model $model): void
     {
         $indexAlias = $model->alias;
         $this->ensureIndexExists($indexAlias, $model->elasticsearchParams);

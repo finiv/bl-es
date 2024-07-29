@@ -36,6 +36,7 @@ class Category extends Model
     public function getElasticsearchBodyAttribute(): array
     {
         return [
+            'id' => $this->id,
             'name' => $this->name,
         ];
     }

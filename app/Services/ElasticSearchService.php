@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Elastic\Elasticsearch\Client;
 use App\Traits\Paginates;
+use Illuminate\Support\Collection;
 
 class ElasticSearchService
 {
@@ -59,20 +60,26 @@ class ElasticSearchService
         return (object) [
             'posts' => $posts,
             'pagination' => $this->paginate($total, $perPage, $page),
+            'categories' => $this->getCategories() // todo fix categories filter
         ];
     }
 
-    public function getCategories(): object
+    public function getCategories(): Collection
     {
         $params = [
-            'index' => 'posts',
+            'index' => 'categories',
             'body' => [
                 'query' => [
-                    'bool' => [
-                        'must' => [],
-                    ],
+                    'match_all' => (object)[],
                 ],
+                'size' => 1000,
             ],
         ];
+
+        $response = $this->client->search($params);
+
+        return collect($response['hits']['hits'])->map(function ($hit) {
+            return $hit['_source'];
+        });
     }
 }

@@ -26,7 +26,6 @@ class DashboardController extends Controller
                 page: $page,
                 perPage: $perPage
             ),
-            'categories' => Category::all(),
         ]);
     }
 
