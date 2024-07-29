@@ -65,9 +65,8 @@
 </template>
 
 <script setup>
-import {Head, Link} from '@inertiajs/vue3';
-import {ref, watch} from 'vue';
-import {usePage} from '@inertiajs/vue3';
+import {Head, Link, usePage} from '@inertiajs/vue3';
+import {ref, onMounted} from 'vue';
 import axios from 'axios';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.css';
@@ -80,6 +79,7 @@ const pagination = ref(data.pagination);
 const searchQuery = ref('');
 const selectedCategories = ref([]);
 const categories = ref(data.categories);
+
 function handleCategoryChange(event) {
     searchPosts();
 }
@@ -118,6 +118,17 @@ async function searchPosts(page = 1) {
         console.error('Error searching posts:', error);
     }
 }
+
+onMounted(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    searchQuery.value = urlParams.get('q') || '';
+
+    const categoryIds = urlParams.get('c') ? urlParams.get('c').split(',').map(Number) : [];
+    selectedCategories.value = categories.value.filter(category => categoryIds.includes(category.id));
+
+    const page = parseInt(urlParams.get('page')) || 1;
+    searchPosts(page);
+});
 </script>
 
 <style scoped>
